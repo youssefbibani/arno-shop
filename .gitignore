@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 3D cup source/build material (README, build script, offline viewer,
+# reference photos) — not used by the deployed site; kept locally only.
+/arno-cup-3d

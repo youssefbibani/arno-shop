@@ -27,6 +27,11 @@ export default function SmoothScroll({
       wheelMultiplier: 1,
       touchMultiplier: 1.15,
       syncTouch: false,
+      // Lets internally-scrollable regions (e.g. the pinned pack cards on
+      // mobile) consume scroll natively while they still have room, then
+      // hand control back to Lenis once they're exhausted — needed for
+      // nested scroll to chain correctly instead of getting stuck.
+      allowNestedScroll: true,
     });
     lenisRef.current = lenis;
 

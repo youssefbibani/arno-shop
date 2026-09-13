@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ARNO Coffee
 
-## Getting Started
+Marketing site for ARNO — a mobile specialty coffee experience for events, communities and brands in Tunisia.
 
-First, run the development server:
+Built with [Next.js](https://nextjs.org) (App Router), [Tailwind CSS](https://tailwindcss.com), [GSAP](https://gsap.com) + [Lenis](https://lenis.darkroom.engineering/) for scroll-driven animation, and [react-three-fiber](https://r3f.docs.pmnd.rs/) for the interactive 3D cup in the hero section.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` — local development server
+- `npm run build` — production build
+- `npm run start` — serve the production build locally
+- `npm run lint` — ESLint
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app` — root layout and the single page route
+- `src/components` — one folder per section (`hero`, `why`, `map`, `packs`, `cta`, `layout`), plus shared `ui` primitives
+- `src/lib` — shared utilities (GSAP setup, fonts, hooks, the hero scroll-progress store)
+- `public/models` — the 3D cup asset (`.glb`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployed on [Vercel](https://vercel.com) — pushes to `main` deploy automatically. Next's built-in Image Optimization API requires a Node-capable host (Vercel works out of the box); a static export would need additional configuration.

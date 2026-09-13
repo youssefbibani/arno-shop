@@ -53,13 +53,25 @@ function MetaIcon({ icon, className }: { icon: PackIcon; className?: string }) {
   }
 }
 
-export default function PackCard({ pack }: { pack: Pack }) {
+export default function PackCard({
+  pack,
+  fullHeight = true,
+}: {
+  pack: Pack;
+  /** Set false when the card sits in a height-capped, internally-scrolling
+   * slot (the mobile pinned carousel) — h-full there would clip the card's
+   * own background/border short of its content, since the slot's cap
+   * doesn't stretch to fit; letting the card size to its natural content
+   * height keeps the background coherent, and the slot alone scrolls. */
+  fullHeight?: boolean;
+}) {
   const featured = pack.featured;
 
   return (
     <div
       className={clsx(
-        "group relative flex h-full flex-col rounded-[28px] border p-8 transition-all duration-400 md:p-9",
+        "group relative flex flex-col rounded-[28px] border p-8 transition-all duration-400 md:p-9",
+        fullHeight ? "h-full" : "h-auto",
         featured
           ? "border-ink bg-ink text-cream shadow-[0_30px_60px_-25px_rgba(11,10,8,0.45)] md:-my-4 md:pb-12 md:pt-11"
           : "border-ink/10 bg-white/70 text-ink hover:-translate-y-1 hover:border-ink/20 hover:shadow-[0_24px_48px_-30px_rgba(11,10,8,0.25)]"
