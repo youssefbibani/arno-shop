@@ -71,7 +71,7 @@ export default function CupCanvas() {
       onPointerUp={endDrag}
       onPointerLeave={onPointerLeave}
       onPointerCancel={endDrag}
-      className="h-full w-full cursor-grab touch-none select-none active:cursor-grabbing"
+      className="h-full w-full cursor-grab touch-pan-y select-none active:cursor-grabbing"
     >
       <Canvas
         dpr={[1, mobile ? 1.5 : 2]}

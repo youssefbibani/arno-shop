@@ -10,6 +10,8 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 const PIN_STEP_VH = 70;
 
+type LenisLike = { scrollTo: (target: number, opts?: { immediate?: boolean }) => void };
+
 export default function Packs() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -48,7 +50,64 @@ export default function Packs() {
         },
       });
 
-      return () => st.kill();
+      // Touch needs full manual arbitration here. Lenis's allowNestedScroll
+      // (SmoothScroll.tsx) correctly hands scroll between a card and the
+      // pin for wheel input, but a real touch gesture keeps its original
+      // DOM target for its whole duration — once the starting card is
+      // exhausted, the rest of that same swipe would otherwise fall straight
+      // through to Lenis and race through the remaining cards in one motion
+      // instead of giving each one its own turn. So every touchmove here is
+      // captured, the *currently visible* card is looked up fresh each tick
+      // (not the touch's original target), and scroll is routed by hand:
+      // into that card while it has room, into the pin's own scroll
+      // position (via Lenis, to stay in sync with it) once exhausted.
+      let lastY = 0;
+
+      function activeSlot() {
+        const row = track!.firstElementChild;
+        const cardWidth = track!.clientWidth || 1;
+        const idx = Math.min(
+          PACKS.length - 1,
+          Math.max(0, Math.round(track!.scrollLeft / cardWidth))
+        );
+        return row?.children[idx] as HTMLElement | undefined;
+      }
+
+      function onTouchStart(e: TouchEvent) {
+        lastY = e.touches[0].clientY;
+      }
+
+      function onTouchMove(e: TouchEvent) {
+        const y = e.touches[0].clientY;
+        const deltaY = lastY - y; // finger up -> positive -> reveal content below
+        lastY = y;
+        e.preventDefault();
+
+        const slot = activeSlot();
+        const maxScroll = slot ? slot.scrollHeight - slot.clientHeight : 0;
+        const canConsume =
+          !!slot &&
+          ((deltaY > 0 && slot.scrollTop < maxScroll - 1) ||
+            (deltaY < 0 && slot.scrollTop > 1));
+
+        if (canConsume && slot) {
+          slot.scrollTop += deltaY;
+        } else {
+          const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
+          const target = window.scrollY + deltaY;
+          if (lenis) lenis.scrollTo(target, { immediate: true });
+          else window.scrollTo(0, target);
+        }
+      }
+
+      inner.addEventListener("touchstart", onTouchStart, { passive: true });
+      inner.addEventListener("touchmove", onTouchMove, { passive: false });
+
+      return () => {
+        st.kill();
+        inner.removeEventListener("touchstart", onTouchStart);
+        inner.removeEventListener("touchmove", onTouchMove);
+      };
     });
 
     return () => mm.revert();
@@ -72,9 +131,9 @@ export default function Packs() {
       {/* Mobile: pinned, scroll drives the cards sliding horizontally —
           Corner, then Signature, then Brand Experience — same mechanic as
           the Why ARNO section's word swap. Each card is taller than one
-          screen, so its slot scrolls internally; Lenis's allowNestedScroll
-          option (see SmoothScroll.tsx) lets that happen natively and hands
-          control back to the pin once a card's own content is exhausted. */}
+          screen, so its slot scrolls internally first, handing control
+          back to the pin once exhausted — see the touchmove handler above
+          for touch, and SmoothScroll.tsx's allowNestedScroll for wheel. */}
       <div ref={wrapperRef} className="relative md:hidden" style={{ height: `${PACKS.length * PIN_STEP_VH}vh` }}>
         <div data-pin-inner className="flex h-screen w-full flex-col items-center justify-center px-6 pt-20">
           <div ref={trackRef} className="w-full max-w-[420px] overflow-hidden">
