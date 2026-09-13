@@ -30,9 +30,12 @@ export default function Packs() {
         minDist = dist;
         closest = i;
       }
+      // Kept gentle on purpose: a peeking card that's too dim or too small
+      // reads as "done with", which fights the very thing this is meant to
+      // do — signal there's more to swipe to.
       const drift = Math.min(dist / (card.offsetWidth + 16), 1);
-      card.style.transform = `scale(${1 - drift * 0.08})`;
-      card.style.opacity = `${1 - drift * 0.5}`;
+      card.style.transform = `scale(${1 - drift * 0.05})`;
+      card.style.opacity = `${1 - drift * 0.22}`;
     });
 
     setActive(closest);
@@ -70,8 +73,18 @@ export default function Packs() {
 
         {/* Mobile: native swipe carousel (no scroll-hijack) — the centered
             card eases into focus, off-center ones recede, and the dots
-            double as tap targets. */}
+            double as tap targets. A first-time visitor has no reason to
+            assume a card row scrolls sideways, so say so outright instead
+            of relying on the peek alone. */}
         <Reveal className="mt-16 md:hidden">
+          <div className="mb-5 flex items-center justify-center gap-2 text-[12.5px] font-medium text-ink/45">
+            <span>3 formules</span>
+            <svg viewBox="0 0 20 20" fill="none" className="swipe-hint-icon h-3.5 w-3.5 text-rust">
+              <path d="M6 5l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M11 5l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+            </svg>
+            <span>glissez pour comparer</span>
+          </div>
           <div
             ref={scrollRef}
             onScroll={handleScroll}

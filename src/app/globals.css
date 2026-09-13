@@ -139,6 +139,21 @@ html.lenis {
   }
 }
 
+@keyframes swipeHint {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(5px);
+    opacity: 1;
+  }
+}
+.swipe-hint-icon {
+  animation: swipeHint 1.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
